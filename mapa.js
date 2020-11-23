@@ -25,7 +25,7 @@
   posicion([1,0,0,0,2,0,3], 4)= 2
   posicion([1,0,0,0,2,0,3],0)= 1
   */
-
+  
   function posicion(lista,y)
   { 
     if(y==0)
@@ -46,7 +46,6 @@
   
   function calcularPosicionTomb(x,y)
   {
-    
     if(x%40==0){
       auxiliarx= Math.floor(x/40);
       auxiliary= Math.floor(y/40);
@@ -69,10 +68,16 @@
     colisionTomb([0,2])= 1
   */
 
+  //Ervin esta funcion te servira para hacer lo de detectar que bloque  hay enfrente, mira las otras veces que la usa natalia o yo, recuerda testear en un fork (un repl.it de pruebas), se usa mas o menos en onTic.
+
   function colisionTomb(x,y)
   {
     return posicion(posicion(mapa,y),x);
   }
+
+  
+
+  
 
   /*
     Contrato: recorrerBloques list, number, number --> number
@@ -145,11 +150,31 @@
     }
   }  
 
+  function apply(a,f) {
+   if (!isEmpty(a)) {
+     f(first(a));
+     apply(rest(a),f);
+    }
+  }
+
+  function moverAgua(agua,dir){
+    const head=first(agua);
+    return cons({x:head.x + dir.x,y:head.y + dir.y}, agua.slice(0, length(agua)-1));
+  }
+
+  function posicionYagua(agua){
+    const posiciones=first(agua)
+    return posiciones.y*(18.6)
+  }
+
   //tamaño estandar de todo dentro del mapa
   const SIZE = 40;
   //tamaño ideal de los dibujos (especificamente seria el ancho y largo de cada bloque)
-  const WIDTH = 24*SIZE;
+  const WIDTH = 25*SIZE;
   const HEIGHT = 15*SIZE;
+
+  const dxa=20
+  const dya=20
 
   //Variables iniciadas en nullptr
   let tomb = null;
@@ -157,20 +182,24 @@
   let MURO2 = null;
   let MURO3 = null;
   let MURO4 = null;
+  let FUEGO = null;
   let MONEDA =null;
+  let AGUA=null
   //Variables utilizadas dentro de funciones.
   let quietoX= false;
   let quietoY= false;
   let listaBloques=[1,3,4,5];
-  
+  let muerteTomb= false;
   //Matriz del mapa
+
+  // Ervin pon 6 donde quieras poner el fuego en el mapa, sitios no muy complicados pero que sea posible morir
   var mapa = 
   [
-				[5, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1],
-				[1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
-				[1, 2, 3, 1, 1, 4, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1],
+				[0, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 0, 1],
+				[1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1],
+				[1, 2, 3, 1, 1, 4, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 6, 1, 1, 1, 2, 1],
 				[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 5],
-				[1, 2, 3, 1, 1, 2, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
+				[1, 2, 3, 1, 1, 6, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
 				[1, 2, 2, 2, 5, 2, 1, 2, 2, 1, 2, 2, 2, 1, 1, 1, 5, 1, 1, 1, 1, 1, 2, 1],
 				[1, 1, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
 				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 3, 1],
@@ -178,9 +207,9 @@
 				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
 				[1, 2, 1, 2, 1, 1, 2, 2, 1, 2, 2, 5, 1, 4, 2, 3, 1, 2, 2, 2, 2, 2, 2, 1],
 				[1, 2, 1, 2, 2, 5, 4, 2, 1, 4, 2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 3, 1, 5],
-				[5, 2, 1, 4, 2, 1, 2, 2, 2, 2, 0, 0, 0, 1, 4, 2, 1, 4, 2, 5, 2, 2, 2, 1],
+				[5, 2, 6, 4, 2, 1, 2, 2, 2, 2, 0, 0, 0, 1, 4, 2, 1, 4, 2, 5, 2, 2, 2, 1],
 				[1, 2, 2, 2, 2, 2, 2, 2, 3, 4, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1],
-				[1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1]
+				[1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1],
 	];
   
   function sketchProc(processing) {
@@ -196,24 +225,28 @@
       MURO2 = processing.loadImage("images/muro2.png");
       MURO3 = processing.loadImage("images/muro3.png");
       MURO4 = processing.loadImage("images/muro4.png");
-      tomb = processing.loadImage("images/tomb.png");
+      FUEGO = processing.loadImage("images/fuego.png");
+      tomb = processing.loadImage("images/tomb2.png");
       MONEDA = processing.loadImage("images/moneda.png");
+      AGUA=processing.loadImage("images/Agua.jpeg")
 
       //Crea los atributos internos de Tomb y de moneda(moneda actualmente no esta editado y sigue sin uso)
-      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/1.5), height:(SIZE/1.5), dirx: 0, diry: 0}, moneda: [{ x: 1, y: 2 }, { x: 2, y: 1 }] };
+      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/*/1.5*/), height:(SIZE/*/1.5*/), dirx: 0, diry: 0}, moneda: [{ x: 2, y: 2 }, { x: 2, y: 1 }],agua:[{x:0,y:29}],dir:{x:0,y:-1/1200} };
       
     }
 
     // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
     processing.drawGame = function (world) {
       processing.background(0, 0, 0);
-      calcularPosicionTomb(world.tomb.x,world.tomb.y); 
+      calcularPosicionTomb(world.tomb.x,world.tomb.y);
+      apply(world.agua,sn =>
+      {processing.image(AGUA,sn.x*dxa,sn.y*dya,1000,600)}); 
 
       // Dibuja el mapa en filas, dando una imagen a cada celda
       recursivelist(mapa, (row, i) => {
         recursivelist(row, (cell, j) => {
-          if(cell == 1) { // Imagen de muro centrado
-            murito1=processing.image(MURO1, j * SIZE, i * SIZE, SIZE, SIZE);
+          if(cell ==1) { // Imagen de muro centrado
+            murito1=processing.image(MURO1, j * SIZE, i *SIZE, SIZE, SIZE);
           }
           if (cell == 2) {
             //Imagen de las monedas
@@ -229,7 +262,7 @@
             processing.image(MURO4, j * SIZE, i * SIZE, SIZE, SIZE);
           }
           if(cell == 6) { //Imagen de futuro muro de fuego
-            processing.image(MURO4, j * SIZE, i * SIZE, SIZE, SIZE);
+            processing.image(FUEGO, j * SIZE, i * SIZE, SIZE, SIZE);
           }
         });
       });
@@ -239,8 +272,6 @@
       //console.log(world.tomb);
       //console.log(posicionActualTomb);
       
-
-
       //Solo actualiza al mundo Tomb dibujandolo a lo largo de su camino.
       if (world.time == 0)
         //imageMode(CENTER);
@@ -261,11 +292,11 @@
       px=(posicionActualTomb.x)
       py=(posicionActualTomb.y)
 
-      if(world.tomb.x<=WIDTH && world.tomb.x>=1){
+      if(world.tomb.x>=1){
         //console.log (world.tomb.y);        
         a=posicion(mapa,py);
         //console.log (posicion(a,px));
-
+        //if(colisionTomb(py,px)==2){
         if(posicion(a,px) == 2){
         //  console.log("aquí hay una moneda");
           mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); //actualiza el mundo
@@ -275,14 +306,14 @@
         }
       }
 
-      ////////////
-      
 
+        ////////////
+  
       // Todas las condiciones siguientes usan la funcion recorrerBloques() y dentro de esta funcion  se usa las siguientes funciones: colisionTomb(), posicion(). los argumentos que usa la funcion recorrerBloques() es: listaBloques creada en la linea 83, la estructura creada apartir de la funcion calcularPosicionTomb(); en el otro lado de la condicion de recorrerBloques() es... .
 
       //Colision a lo largo del tiempo en el eje Y,
       //Cuando pasa la condicion adecuada pone la velocidad en 0, pone el booleano quietoY en true, lo que significa que tomb esta quieto en el momento.
-     
+      
       if( recorrerBloques(listaBloques, px, py-1) && (world.tomb.diry ==-4))
       {
         quietoY=true;
@@ -291,9 +322,11 @@
       }
       else if( recorrerBloques(listaBloques, px, py+1) && (world.tomb.diry ==4))
       {
+        
         console.log("Choco contra la pared de abajo y paro");
         quietoY=true;
         return make(world, { time: world.time + 1, tomb: { x: world.tomb.x , y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: 0}});
+        
       }
 
       //Colision a lo largo del tiempo en el eje X
@@ -305,16 +338,39 @@
         quietoX=true;
         return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: world.tomb.diry}});
       }
-      else if( recorrerBloques(listaBloques,px+1, py) && (world.tomb.dirx ==4))
+      else if( recorrerBloques(listaBloques, px+1, py) && (world.tomb.dirx ==4))
       {
         console.log("Choco contra la pared derecha y paro")
         quietoX=true;
         return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: world.tomb.diry}});
+        
       }
+      
+      //Ervin por aqui va mas o menos tu colision con el fuego , normalmente sus coordenadas de x y como width y hight se podrian ir a null o a un lugar donde no se vea el tomb para decir que desaparecio, tu decides, pero segun esos datos va a trabajar seguramente alejandro 
+      
+      
+       if (colisionTomb(px,py)==6)
+      {
+        return make(world, { time: world.time = 0, tomb: { x: 440, y: 524, width: SIZE, height:SIZE, dirx: 0, diry: 0}});
+        muerteTomb=true;
+      }
+
+      if (world.tomb.y>=posicionYagua(world.agua) && ((world.tomb.y)-40)<posicionYagua(world.agua)){
+        return make(world, { time: world.time = 0, tomb: { x: 440, y: 524, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:29}],dir:{x:0,y:-1/800}});
+        muerteTomb=true;
+      }
+
+      function iniciar(tomb){
+        if (muerteTomb==true){
+          muerteTomb=false;
+        }      
+      }
+      
+
       
       //Esta linea 213, hace que tomb siga actualizandose cuando no haya ningun bloque al lado de el como las anteriores condicionales.
 
-      return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width:world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry}});
+      return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width:world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry}, agua: moverAgua(world.agua, world.dir)});
  
     }
 
@@ -439,6 +495,17 @@
     }
     // Fin de los eventos del mouse
   }
+ 
+
+
+
+
+
+
+
+
+
+
 
   var canvas = document.getElementById("canvas");
 
