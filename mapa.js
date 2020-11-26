@@ -23,7 +23,7 @@
   posicion(){Cuerpo de la funcion}
   Ejemplos:
   posicion([1,0,0,0,2,0,3], 4)= 2
-  posicion([1,0,0,0,2,0,3],0)= 1
+  posicion([1,0,0,0,2,0,3], 0)= 1
   */
   
   function posicion(lista,y)
@@ -58,7 +58,7 @@
     posicionActualTomb={x:auxiliarx,y:auxiliary}
     return posicionActualTomb;
   }
-  
+
   /*
     Contrato: colisionTomb number, number --> number
     Funcionalidad: Dice el dato en la posicion de la matriz dada, en este caso el mapa en cuestion.
@@ -68,16 +68,10 @@
     colisionTomb([0,2])= 1
   */
 
-  //Ervin esta funcion te servira para hacer lo de detectar que bloque  hay enfrente, mira las otras veces que la usa natalia o yo, recuerda testear en un fork (un repl.it de pruebas), se usa mas o menos en onTic.
-
   function colisionTomb(x,y)
   {
     return posicion(posicion(mapa,y),x);
   }
-
-  
-
-  
 
   /*
     Contrato: recorrerBloques list, number, number --> number
@@ -164,17 +158,55 @@
 
   function posicionYagua(agua){
     const posiciones=first(agua)
-    return posiciones.y*(18.6)
+    return posiciones.y
+  }
+
+  function posicionCentrica(x,y)
+  {
+    centroTombX=Math.floor(x+((x-(x-SIZE))/2));
+    centroTombY=Math.floor(y+((y-(y-SIZE))/2));
+
+    centroTomb={x:centroTombX,y:centroTombY};
+    return centroTomb;
+  }
+
+  function comparacion()
+  {
+    auxiliarX=40*posicionActualTomb.x;
+    comparacionX= Math.floor(auxiliarX+((auxiliarX-(auxiliarX-SIZE))/2));
+    
+    auxiliarY=40*posicionActualTomb.y;
+    comparacionY= Math.floor(auxiliarY+((auxiliarY-(auxiliarY-SIZE))/2));
+
+    comparar={x:comparacionX,y:comparacionY};
+    
+    return ;
+  } 
+
+  function quieto(x,y)
+  {
+    if (x && y)
+    {
+      return true;
+    }
+    else if(x || y)
+    {
+      return false;
+    }
+    else
+    {
+      return false;
+    }
   }
 
   //tamaño estandar de todo dentro del mapa
   const SIZE = 40;
   //tamaño ideal de los dibujos (especificamente seria el ancho y largo de cada bloque)
-  const WIDTH = 25*SIZE;
+  const WIDTH = 24*SIZE;
   const HEIGHT = 15*SIZE;
 
-  const dxa=20
-  const dya=20
+  const dxa=1
+  const dya=1
 
   //Variables iniciadas en nullptr
   let tomb = null;
@@ -190,20 +222,27 @@
   let quietoY= false;
   let listaBloques=[1,3,4,5];
   let muerteTomb= false;
+  let presionadoArriba= false;
+  let presionadoAbajo= false;
+  let presionadoDerecha= false;
+  let presionadoIzquierda= false;
+  let vidas = 3;
+  let perder = false;
+  let ganar = true;
   //Matriz del mapa
 
   // Ervin pon 6 donde quieras poner el fuego en el mapa, sitios no muy complicados pero que sea posible morir
   var mapa = 
   [
-				[0, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 0, 1],
-				[1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 1],
-				[1, 2, 3, 1, 1, 4, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 6, 1, 1, 1, 2, 1],
+				[5, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1],
+				[1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+				[1, 2, 3, 1, 1, 4, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1],
 				[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 5],
-				[1, 2, 3, 1, 1, 6, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
-				[1, 2, 2, 2, 5, 2, 1, 2, 2, 1, 2, 2, 2, 1, 1, 1, 5, 1, 1, 1, 1, 1, 2, 1],
+				[1, 2, 3, 1, 1, 2, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
+				[1, 2, 2, 2, 5, 2, 1, 2, 2, 1, 2, 2, 2, 1, 6, 1, 5, 1, 1, 1, 1, 1, 2, 1],
 				[1, 1, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
 				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1, 2, 3, 1],
-				[1, 2, 3, 1, 4, 2, 1, 1, 2, 2, 3, 1, 1, 4, 2, 5, 1, 1, 1, 2, 5, 2, 2, 1],
+				[1, 2, 3, 1, 4, 2, 1, 1, 2, 2, 3, 6, 1, 4, 2, 5, 1, 1, 1, 2, 5, 2, 2, 1],
 				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
 				[1, 2, 1, 2, 1, 1, 2, 2, 1, 2, 2, 5, 1, 4, 2, 3, 1, 2, 2, 2, 2, 2, 2, 1],
 				[1, 2, 1, 2, 2, 5, 4, 2, 1, 4, 2, 1, 2, 2, 2, 2, 1, 2, 2, 1, 2, 3, 1, 5],
@@ -231,16 +270,21 @@
       AGUA=processing.loadImage("images/Agua.jpeg")
 
       //Crea los atributos internos de Tomb y de moneda(moneda actualmente no esta editado y sigue sin uso)
-      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/*/1.5*/), height:(SIZE/*/1.5*/), dirx: 0, diry: 0}, moneda: [{ x: 2, y: 2 }, { x: 2, y: 1 }],agua:[{x:0,y:29}],dir:{x:0,y:-1/1200} };
+      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/*/1.5*/), height:(SIZE/*/1.5*/), dirx: 0, diry: 0}, moneda: [{ x: 2, y: 2 }, { x: 2, y: 1 }],agua:[{x:0,y:700}],dir:{x:0,y:-1/20} };
       
     }
 
     // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
     processing.drawGame = function (world) {
       processing.background(0, 0, 0);
+
       calcularPosicionTomb(world.tomb.x,world.tomb.y);
+      posicionCentrica(world.tomb.x,world.tomb.y);
+      comparacion();
+
       apply(world.agua,sn =>
       {processing.image(AGUA,sn.x*dxa,sn.y*dya,1000,600)}); 
+      
 
       // Dibuja el mapa en filas, dando una imagen a cada celda
       recursivelist(mapa, (row, i) => {
@@ -274,10 +318,8 @@
       
       //Solo actualiza al mundo Tomb dibujandolo a lo largo de su camino.
       if (world.time == 0)
-        //imageMode(CENTER);
         processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
       else
-        //imageMode(CENTER);
         processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
       
     }
@@ -309,61 +351,107 @@
 
         ////////////
   
-      // Todas las condiciones siguientes usan la funcion recorrerBloques() y dentro de esta funcion  se usa las siguientes funciones: colisionTomb(), posicion(). los argumentos que usa la funcion recorrerBloques() es: listaBloques creada en la linea 83, la estructura creada apartir de la funcion calcularPosicionTomb(); en el otro lado de la condicion de recorrerBloques() es... .
+     
+      
+      if (presionadoArriba && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
+      {
+        console.log("hizo la comprobacion arriba 2.0")
+        quietoY=false;
+        presionadoArriba =false;
+        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:-4}});
+      }
+
+      if (presionadoAbajo && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
+      {
+        console.log("hizo la comprobacion abajo 2.0")
+        quietoY=false;
+        presionadoAbajo =false;
+        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:4}});
+      }
+
+      if (presionadoIzquierda && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
+      {
+        console.log("hizo la comprobacion izquierda 2.0")
+        quietoX=false;
+        presionadoIzquierda =false;
+        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:-4, diry:0}});
+      } 
+
+      if (presionadoDerecha && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
+      {
+        console.log("hizo la comprobacion derecha 2.0")
+        quietoX=false;
+        presionadoDerecha =false;
+        return make(world, {time:world.time+1,tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:4, diry:0}});
+      }     
+
+
+       // Todas las condiciones siguientes usan la funcion recorrerBloques() y dentro de esta funcion  se usa las siguientes funciones: colisionTomb(), posicion(). los argumentos que usa la funcion recorrerBloques() es: listaBloques creada en la linea 83, la estructura creada apartir de la funcion calcularPosicionTomb(); en el otro lado de la condicion de recorrerBloques() es... .
 
       //Colision a lo largo del tiempo en el eje Y,
       //Cuando pasa la condicion adecuada pone la velocidad en 0, pone el booleano quietoY en true, lo que significa que tomb esta quieto en el momento.
-      
-      if( recorrerBloques(listaBloques, px, py-1) && (world.tomb.diry ==-4))
+
+      if( recorrerBloques(listaBloques, px, py-1) && (world.tomb.diry ==-4) && (comparar.y==centroTomb.y))
       {
         quietoY=true;
         console.log("Choco contra la pared de arriba y paro")
-        return make(world, { time: world.time + 1, tomb: { x: world.tomb.x , y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: 0}});
+        return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
-      else if( recorrerBloques(listaBloques, px, py+1) && (world.tomb.diry ==4))
+
+      if( recorrerBloques(listaBloques, px, py+1) && (world.tomb.diry ==4) && (comparar.y==centroTomb.y))
       {
-        
-        console.log("Choco contra la pared de abajo y paro");
         quietoY=true;
-        return make(world, { time: world.time + 1, tomb: { x: world.tomb.x , y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: 0}});
-        
+        console.log("Choco contra la pared de abajo y paro");
+        return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
+
       }
 
       //Colision a lo largo del tiempo en el eje X
       //Cuando pasa la condicion adecuada pone la velocidad en 0, pone el booleano quietoX en true, lo que significa que tomb esta quieto en el momento.
       
-      if( recorrerBloques(listaBloques, px-1, py) && (world.tomb.dirx ==-4))
+      if( recorrerBloques(listaBloques, px-1, py) && (world.tomb.dirx==-4) && (comparar.x==centroTomb.x))
       {
         console.log("Choco contra la pared izq y paro")
+        
         quietoX=true;
-        return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: world.tomb.diry}});
+        return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
-      else if( recorrerBloques(listaBloques, px+1, py) && (world.tomb.dirx ==4))
+      
+      if( recorrerBloques(listaBloques,px+1, py) && (world.tomb.dirx ==4) && (comparar.x==centroTomb.x))
       {
         console.log("Choco contra la pared derecha y paro")
         quietoX=true;
-        return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: world.tomb.diry}});
+        return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
         
       }
+
+
+      //Colisión con obstáculo & muere Tomb
       
-      //Ervin por aqui va mas o menos tu colision con el fuego , normalmente sus coordenadas de x y como width y hight se podrian ir a null o a un lugar donde no se vea el tomb para decir que desaparecio, tu decides, pero segun esos datos va a trabajar seguramente alejandro 
-      
-      
-       if (colisionTomb(px,py)==6)
-      {
-        return make(world, { time: world.time = 0, tomb: { x: 440, y: 524, width: SIZE, height:SIZE, dirx: 0, diry: 0}});
+      if (colisionTomb(px,py)==6)
+      { 
         muerteTomb=true;
+        vidas=vidas-1
+        return make(world, { time: world.time = 0, tomb: { x: 11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:599}],dir:{x:0,y:-1/20}});
+        
       }
 
-      if (world.tomb.y>=posicionYagua(world.agua) && ((world.tomb.y)-40)<posicionYagua(world.agua)){
-        return make(world, { time: world.time = 0, tomb: { x: 440, y: 524, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:29}],dir:{x:0,y:-1/800}});
+      if (world.tomb.y>=(posicionYagua(world.agua)-32) && ((world.tomb.y)-40)<(posicionYagua(world.agua))-32){
         muerteTomb=true;
+        vidas=vidas-1
+        return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:599}],dir:{x:0,y:-1/20}});
       }
 
-      function iniciar(tomb){
-        if (muerteTomb==true){
+
+       //Vidas... Inhala y exhala
+       
+      if (muerteTomb==true){
+        if(vidas>0){
           muerteTomb=false;
-        }      
+        }
+        else if (vidas<=0){
+          perder=true;
+        }
       }
       
 
@@ -392,14 +480,19 @@
 
       if (keyCode==processing.UP)
       {
-        if( recorrerBloques(listaBloques, px, py-1) && quietoY== true )
+        presionadoArriba =true;
+        
+        if( recorrerBloques(listaBloques, px, py-1) && quieto(quietoX,quietoY))
         {
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: 0 }} );
+          console.log("se fue por aca arriba")
+          presionadoArriba=false;
+          return make(world,{tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0 }});
         }
-        else
-        { 
+        else 
+        {
+          console.log("no hizo nada arriba")
           quietoY=false;
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: -4 }} );
+          return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry }} );
         }
       }
 
@@ -407,14 +500,19 @@
 
       if (keyCode==processing.DOWN)
       {
-        if( recorrerBloques(listaBloques, px, py+1) && quietoY== true )
+        presionadoAbajo =true;
+        
+        if( recorrerBloques(listaBloques, px, py+1) && quieto(quietoX,quietoY))
         {
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: 0 }} );
+          console.log("se fue por aca abajo")
+          presionadoAbajo=false;
+          return make(world,{tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0 }});
         }
-        else
+        else 
         {
+          console.log("no hizo aqui abajo")
           quietoY=false;
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: 4 }} );
+          return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry }} );
         }
       }
 
@@ -422,14 +520,19 @@
 
       if (keyCode==processing.LEFT)
       {
-        if( recorrerBloques(listaBloques,px-1,py) && quietoX==true )
+        presionadoIzquierda =true;
+        
+        if( recorrerBloques(listaBloques, px-1, py) && quieto(quietoX,quietoY))
         {
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: 0 }} );
+          console.log("se fue por aca izquierda")
+          presionadoIzquierda=false;
+          return make(world,{tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0 }});
         }
-        else
+        else 
         {
-          quietoX=false;
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: -4, diry: 0 }} );
+          console.log("no hizo aqui izquierda")
+          quietoY=false;
+          return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry }} );
         }
       }
 
@@ -437,18 +540,22 @@
 
       if (keyCode==processing.RIGHT)
       {
-        if( recorrerBloques(listaBloques,px+1,py) && quietoX==true )
+        presionadoDerecha =true;
+        
+        if( recorrerBloques(listaBloques, px+1, py) && quieto(quietoX,quietoY))
         {
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: 0 }} );
+          console.log("se fue por aca derecha")
+          presionadoDerecha=false;
+          return make(world,{tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0 }});
         }
-        else
+        else 
         {
-          quietoX=false;
-          return make(world,{tomb:{ x: world.tomb.x, y: world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 4, diry: 0 }} );
+          console.log("no hizo aqui derecha")
+          quietoY=false;
+          return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry }} );
         }
       }
     }
-
 
     // ******************** De aquí hacia abajo no debe cambiar nada. ********************
 

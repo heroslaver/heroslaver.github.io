@@ -1,0 +1,12 @@
+*{
+  margin:0;
+  padding: 0;
+  list-style: none;
+  text-decoration: none;
+}
+#contenedorJuego{
+  position: relative;
+  margin: 0vh auto; 
+  width: 950px;
+  height: 500px;
+}
