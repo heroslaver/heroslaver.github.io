@@ -4,9 +4,24 @@
   list-style: none;
   text-decoration: none;
 }
+
 #contenedorJuego{
   position: relative;
   margin: 0vh auto; 
   width: 950px;
   height: 500px;
 }
+
+#canvas-container{
+  position: relative;
+  margin: 0vh auto; 
+  width: 0px;
+  height: 900px;
+}
+#game-status{
+  position: relative;
+  margin: 0vh auto; 
+  width: 0px;
+  height: 900px;
+}
+

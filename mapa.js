@@ -7,7 +7,6 @@
     return Object.assign({}, data, attribute);
   }
   
-
   //Hace funcionar el reconocimiento de cada celda en el mapa, si se quita deja de funcionar
 
   function recursivelist(l, f, index = 0) {
@@ -54,7 +53,6 @@
       auxiliarx= Math.floor(x/40);
       auxiliary= Math.floor(y/40);
     }
-  
     posicionActualTomb={x:auxiliarx,y:auxiliary}
     return posicionActualTomb;
   }
@@ -198,6 +196,49 @@
       return false;
     }
   }
+  /*
+contratro: contar: list,number,number-> number
+proposito: retorna la cantidad de 2 que hay en una lista
+contar(lista){}
+ejemplos:  
+  contar([1,2,2,3,1]) -> 2
+  contar([1,2,2,2,4,2]) -> 4
+  contar([2]) -> 1
+*/
+function contar(mapa){
+  if(isEmpty(mapa)){
+    return 0;
+  }else if(first(mapa)==2){
+    return 1 + contar(rest(mapa));
+  }else{
+    return 0 + contar(rest(mapa))
+  }
+}
+/*
+contratro: contar: list-> number
+proposito: retorna la cantidad de 2 que hay en una lista conformada por listas.(determina cuantas monedas hay)
+cantidadMonedas(mapa){}
+ejemplos:  
+  cantidadMonedas([[1,2,2,2,2,1],[1,2,3,2,2]) -> 7
+*/
+
+
+function cantidadMonedas(mapa){
+if(isEmpty(mapa)){
+    return 0;
+}else if(mapa.length==0){
+  return 0;
+}else if(mapa.length==1){
+  return contar(posicion(mapa,0));
+}else if(mapa.length==2){  
+   return contar(posicion (mapa,0))+contar(posicion (mapa,mapa.length-1))
+}else{
+  return contar(posicion (mapa,0))+cantidadMonedas(rest(mapa));
+}
+
+}
+
+
 
   //tamaño estandar de todo dentro del mapa
   const SIZE = 40;
@@ -217,6 +258,8 @@
   let FUEGO = null;
   let MONEDA =null;
   let AGUA=null
+  
+  
   //Variables utilizadas dentro de funciones.
   let quietoX= false;
   let quietoY= false;
@@ -226,9 +269,14 @@
   let presionadoAbajo= false;
   let presionadoDerecha= false;
   let presionadoIzquierda= false;
-  let vidas = 3;
   let perder = false;
   let ganar = true;
+
+  //Variables de interfaz
+  let vidas = 3;
+  let puntos=0;
+  
+
   //Matriz del mapa
 
   // Ervin pon 6 donde quieras poner el fuego en el mapa, sitios no muy complicados pero que sea posible morir
@@ -250,6 +298,7 @@
 				[1, 2, 2, 2, 2, 2, 2, 2, 3, 4, 0, 0, 0, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 1],
 				[1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1],
 	];
+  let cantMonedas = cantidadMonedas(mapa);
   
   function sketchProc(processing) {
     /**
@@ -268,12 +317,10 @@
       tomb = processing.loadImage("images/tomb2.png");
       MONEDA = processing.loadImage("images/moneda.png");
       AGUA=processing.loadImage("images/Agua.jpeg")
-
-      //Crea los atributos internos de Tomb y de moneda(moneda actualmente no esta editado y sigue sin uso)
-      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/*/1.5*/), height:(SIZE/*/1.5*/), dirx: 0, diry: 0}, moneda: [{ x: 2, y: 2 }, { x: 2, y: 1 }],agua:[{x:0,y:700}],dir:{x:0,y:-1/20} };
       
+      //Crea los atributos internos de Tomb y de moneda(moneda actualmente no esta editado y sigue sin uso)
+      processing.state = {tomb: { x:11*SIZE, y:13*SIZE, width:(SIZE/*/1.5*/), height:(SIZE/*/1.5*/), dirx: 0, diry: 0}, moneda: [{ x: 2, y: 2 }, { x: 2, y: 1 }],agua:[{x:0,y:620}],dir:{x:0,y:-1/30} };
     }
-
     // Dibuja algo en el canvas. Aqui se pone todo lo que quieras pintar
     processing.drawGame = function (world) {
       processing.background(0, 0, 0);
@@ -283,8 +330,7 @@
       comparacion();
 
       apply(world.agua,sn =>
-      {processing.image(AGUA,sn.x*dxa,sn.y*dya,1000,600)}); 
-      
+      {processing.image(AGUA,sn.x*dxa,sn.y*dya,1000,600)});
 
       // Dibuja el mapa en filas, dando una imagen a cada celda
       recursivelist(mapa, (row, i) => {
@@ -321,33 +367,29 @@
         processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
       else
         processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
-      
     }
 
-   
     processing.onTic = function (world) {
-      
-      // Actualiza el tiempo lo que hace que tomb tenga su posicion en X y Y mas la velocidad respectiva entregada desde el teclado (onKeyEvent).
-      
-    
+   
+      // Actualiza el tiempo lo que hace que tomb tenga su posicion en X y Y mas la velocidad respectiva entregada desde el teclado (onKeyEvent)
+
       //Decir lo que hay en la posicion de tomb
       px=(posicionActualTomb.x)
       py=(posicionActualTomb.y)
 
-      if(world.tomb.x>=1){
-        //console.log (world.tomb.y);        
+      if(world.tomb.x>=1){   
         a=posicion(mapa,py);
-        //console.log (posicion(a,px));
-        //if(colisionTomb(py,px)==2){
+        //condicional de las monedas
         if(posicion(a,px) == 2){
-        //  console.log("aquí hay una moneda");
+          console.log("cantidad de monedas en el mapa: ", cantidadMonedas(mapa));
+          puntos=puntos+10;
+          console.log("los puntos son: ", puntos);
           mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); //actualiza el mundo
-
         }else{
          // console.log("no hay moneda");//por lo tanto no hace nada
         }
-      }
 
+      }
 
         ////////////
   
@@ -432,18 +474,18 @@
       { 
         muerteTomb=true;
         vidas=vidas-1
-        return make(world, { time: world.time = 0, tomb: { x: 11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:599}],dir:{x:0,y:-1/20}});
+        return make(world, { time: world.time = 0, tomb: { x: 11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/20}});
         
       }
 
       if (world.tomb.y>=(posicionYagua(world.agua)-32) && ((world.tomb.y)-40)<(posicionYagua(world.agua))-32){
         muerteTomb=true;
         vidas=vidas-1
-        return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:599}],dir:{x:0,y:-1/20}});
+        return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/20}});
       }
 
 
-       //Vidas... Inhala y exhala
+       //Función para restar las vidas de Tomb según su parámetro "vidas".
        
       if (muerteTomb==true){
         if(vidas>0){
@@ -453,6 +495,60 @@
           perder=true;
         }
       }
+////////////////
+
+       
+         
+
+
+              if(vidas==0){ 
+          vidas=vidas-1
+         Swal.fire({
+         title: 'PERDISTE \n tu puntaje es: ',
+         text: puntos,
+         confirmButtonText: 'aceptar',
+         footer: 'adios a todos',
+         showConfirmButton: false
+         
+          
+         
+        });if(vidas<0){
+                    
+                document.location.reload(mapa)}
+        
+        }
+        
+        
+        
+    
+     
+  
+         
+
+
+
+        
+      
+     //  console.log("cantidad de monedas: ",cantMonedas); 
+        
+        if(cantMonedas==174&&puntos==1740){
+          puntos=puntos+1;
+         Swal.fire({
+         title: 'GANASTE \n tu puntaje es: ',
+         text: puntos,
+         confirmButtonText: 'aceptar',
+         footer: 'felicidades'
+         
+        });if((cantMonedas==174||puntos==1740)==true){
+                    
+                document.location.reload(mapa)}
+
+
+         
+        }
+        
+      
+///////////////
       
 
       
