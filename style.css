@@ -7,9 +7,11 @@
 
 #contenedorJuego{
   position: relative;
-  margin: 0vh auto; 
+  margin-right:  auto; 
+  margin-left: auto;
   width: 950px;
   height: 500px;
+  
 }
 
 #canvas-container{
@@ -25,3 +27,16 @@
   height: 900px;
 }
 
+
+body{
+background-color:red;
+
+}
+
+html {
+    background: url(https://i.ytimg.com/vi/1sK0ujiu2ec/maxresdefault.jpg) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    -o-background-size: cover;
+    background-size: cover;
+}
