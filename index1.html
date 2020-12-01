@@ -1,12 +1,6 @@
-<body style="background-color:rgba(0,26,140,0.5);">
+<body background="images/fondo.png">
 <html>
-  
-     
-       <h1>Tomb of the  Mask </h1>
- 
-   
-   
-   
+      <font face="Roman" color="F7F71C" size="8">Tomb of the mask</font>
    </body>
    <head>
    <meta charset="utf-8">
@@ -14,10 +8,12 @@
     <title>repl.it</title> <link rel="icon"type="images/juego.png"width="600" height="960"
     <link href="style.css" rel="stylesheet" type="text/css" />
     <title>FDP</title>
-    <div id= "contenedorJuego">
+    
+  <div id= "contenedorJuego">
     <canvas id="canvas" width="960" height="600"> </canvas>
-     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-    </div>
+       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+   </div>
+
    </head>
    
     <h2>
@@ -26,7 +22,12 @@
     <nav class="navbar navbar-default" role="navigation">
   <!-- El logotipo y el icono que despliega el menú se agrupan
        para mostrarlos mejor en los dispositivos móviles -->
-</h2>
+      <div>
+      Vida: <a id="vidas"></a>
+        <br>
+      Puntaje: <a id="puntos"></a> 
+      </div>
+    </h2>
 
     <script src="js/functional-light.js"></script>
     <script src="js/processing.js"></script>
@@ -36,7 +37,7 @@
     <script src="js/sweetAlert.js"></script>  
 
 
-    <div id="canvas-container">
+    <div id="canvas-container"></div>
       
 
    

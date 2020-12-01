@@ -36,8 +36,6 @@ function sketchProc(processing) {
     processing.background(255, 204, 0);
     processing.rect(world.x, world.y, world.ancho, world.alto)
 
-
-
   }
 
   // Actualiza el mundo despues de cada frame. En este ejemplo, no cambia nada, solo retorna una copia del mundo

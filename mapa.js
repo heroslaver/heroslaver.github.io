@@ -7,7 +7,7 @@
     return Object.assign({}, data, attribute);
   }
   
-  //Hace funcionar el reconocimiento de cada celda en el mapa, si se quita deja de funcionar
+  //Hace funcionar el reconocimiento de cada celda en el mapa.
 
   function recursivelist(l, f, index = 0) {
     if (!isEmpty(l)) {
@@ -34,6 +34,8 @@
     
   }
   
+
+
   /*
     Contrato: calcularPosicionTomb number, number --> structure
     Funcionalidad: Calcula la posicion en cuadricula cuando esta es multiplo de 40.
@@ -143,10 +145,9 @@
   }  
 
   /*
-    Contrato: nombre, number, number --> number
-    Funcionalidad: .
-    nombre(){Cuerpo de la funcion}
-    Ejemplos:
+    Contrato: apply, list, function --> list
+    Funcionalidad: aplica los atributos definidos para un elemento a la forma o parte visual de este.
+    apply(){Cuerpo de la funcion}
   */
   
   function apply(a,f) {
@@ -157,10 +158,11 @@
   }
 
   /*
-    Contrato: nombre, number, number --> number
-    Funcionalidad: .
-    nombre(){Cuerpo de la funcion}
+    Contrato: moverAgua, list, JSON --> list
+    Funcionalidad: extrae el primer elemento de una lista que es a su vez una estructura y suma sus elementos con los de otra estructura para crear un lista nueva.
+    moverAgua(){Cuerpo de la funcion}
     Ejemplos:
+    moverAgua([{x:9, y:30}],{x:4, y:9}) -> [{x:13 , y:39}]
   */
 
   function moverAgua(agua,dir)
@@ -170,10 +172,11 @@
   }
   
   /*
-    Contrato: nombre, number, number --> number
-    Funcionalidad: .
-    nombre(){Cuerpo de la funcion}
+    Contrato: posicionYagua, list--> number
+    Funcionalidad: mostrar un elemento de una estructura la cual se encuentra dentro de una lista
+    posicionYagua(){Cuerpo de la funcion}
     Ejemplos:
+    posicionYagua([{x: 4, y:8}]) -> 8
   */
   
   function posicionYagua(agua)
@@ -271,10 +274,6 @@
   const WIDTH=24*SIZE;
   const HEIGHT=15*SIZE;
 
-  //
-  const dxa=1;
-  const dya=1;
-
   //Variables iniciadas en nullptr
   let tomb=null;
   let MURO1=null;
@@ -283,7 +282,8 @@
   let MURO4=null;
   let AGUITA=null;
   let MONEDA=null;
-  let AGUA=null
+  let AGUA=null;
+  let MANZANA=null;
   
   
   //Variables utilizadas dentro de funciones.
@@ -295,11 +295,28 @@
   let presionadoDerecha=false;
   let presionadoIzquierda=false;
   let perder=false;
-  let ganar=true;
+  let tiempo=0;
 
   //Variables de interfaz
   let vidas=3;
   let puntos=0;
+
+  // Actualizar las vidas en el tablero
+  function actualizaVida() {
+    verVidas.textContent = vidas;
+  };
+   //Actualiza el puntaje del usuario
+  function actualizaPuntaje() {
+    verScore.textContent = puntos;
+  };
+
+  const verScore = document.getElementById("puntos");
+  const verVidas = document.getElementById("vidas");
+  
+  
+
+  
+  
   
 
   //Matriz del mapa
@@ -307,15 +324,15 @@
   var mapa = 
   [
 				[5, 1, 1, 1, 1, 1, 5, 1, 1, 1, 1, 1, 5, 1, 1, 5, 1, 1, 1, 1, 1, 1, 1, 1],
-				[1, 2, 2, 2, 2, 2, 2, 1, 2, 6, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1],
+				[1, 7, 2, 2, 2, 2, 2, 1, 2, 6, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 7, 1],
 				[1, 2, 3, 1, 1, 4, 2, 1, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 2, 1, 1, 1, 2, 1],
 				[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 5],
 				[1, 2, 3, 1, 6, 2, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
 				[1, 2, 2, 2, 5, 2, 1, 2, 2, 1, 2, 2, 2, 1, 6, 1, 5, 1, 1, 1, 1, 1, 2, 1],
-				[1, 6, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
-				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 1, 2, 6, 1],
+				[1, 1, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
+				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 1, 2, 3, 1],
 				[1, 2, 3, 1, 4, 2, 6, 1, 2, 2, 3, 1, 1, 4, 2, 5, 1, 1, 1, 2, 5, 2, 2, 1],
-				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 6, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
+				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
 				[1, 2, 1, 2, 1, 1, 2, 2, 1, 2, 2, 5, 1, 4, 2, 3, 1, 2, 2, 2, 2, 2, 2, 1],
 				[1, 2, 1, 2, 2, 5, 4, 2, 1, 4, 2, 1, 2, 2, 2, 2, 1, 2, 2, 6, 2, 3, 1, 5],
 				[5, 2, 6, 4, 2, 1, 2, 2, 2, 2, 0, 0, 0, 1, 4, 2, 1, 4, 2, 5, 2, 2, 2, 1],
@@ -336,18 +353,19 @@
       processing.frameRate(60);
       processing.size(WIDTH, HEIGHT);
 
-      //Carga las imagenes de los muros, monedas, agua y Tomb.
-      MURO1 = processing.loadImage("images/muro1.png");
-      MURO2 = processing.loadImage("images/muro2.png");
-      MURO3 = processing.loadImage("images/muro3.png");
-      MURO4 = processing.loadImage("images/muro4.png");
-      AGUITA = processing.loadImage("images/Aguita.png");
-      tomb = processing.loadImage("images/tomb2.png");
-      MONEDA = processing.loadImage("images/moneda.png");
-      AGUA=processing.loadImage("images/Agua.jpeg")
+      //Carga las imagenes de los muros, monedas, manzana, agua y Tomb.
+      MURO1=processing.loadImage("images/muro1.png");
+      MURO2=processing.loadImage("images/muro2.png");
+      MURO3=processing.loadImage("images/muro3.png");
+      MURO4=processing.loadImage("images/muro4.png");
+      AGUITA=processing.loadImage("images/Aguita.png");
+      tomb=processing.loadImage("images/tomb2.png");
+      MONEDA=processing.loadImage("images/moneda.png");
+      MANZANA=processing.loadImage("images/Apple.png");
+      AGUA=processing.loadImage("images/Agua.jpeg");
       
       //Crea los atributos internos de Tomb y del agua.
-      processing.state={tomb:{x:11*SIZE, y:13*SIZE, width:(SIZE), height:(SIZE), dirx:0, diry:0}, agua:[{x:0, y:620}], dir:{x:0, y:-1/30}};
+      processing.state={tomb:{x:11*SIZE, y:13*SIZE, width:(SIZE), height:(SIZE), dirx:0, diry:0}, agua:[{x:0, y:610}], dir:{x:0, y:-1/20}};
     }
 
     //Todo lo que dibuja al juego
@@ -359,7 +377,9 @@
       posicionCentrica(world.tomb.x,world.tomb.y);
       comparacion();
       apply(world.agua,sn =>
-      {processing.image(AGUA,sn.x*dxa,sn.y*dya,1000,600)});
+      {processing.image(AGUA,sn.x*1,sn.y*1,1000,600)});
+      actualizaVida();
+      actualizaPuntaje();
 
       // Dibuja el mapa en filas, dando una imagen a cada celda
       recursivelist(mapa, (row, i) => {
@@ -382,6 +402,9 @@
           if(cell == 6) { //Imagen del charco
             processing.image(AGUITA, j * SIZE, i * SIZE, SIZE, SIZE);
           }
+          if(cell == 7) { //Imagen de manzana
+            processing.image(MANZANA, j * SIZE + SIZE / 3, i * SIZE + SIZE / 3, SIZE / 2, SIZE /2);
+          }
         });
       });
 
@@ -401,38 +424,59 @@
       px=(posicionActualTomb.x)
       py=(posicionActualTomb.y)
 
+      //Condicional que comienza a contar cuando tomb recoge una manzana, hace que el agua vuelva a la normalidad.
+      if(tiempo==(10*60)){
+        tiempo=0;
+        console.log(tiempo);
+        return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:-1/20}});
+      }
+      else if(tiempo<(10*60) && tiempo>0){
+        tiempo=tiempo+1;
+      }
+
+
       if(world.tomb.x>=1)
       {   
         a=posicion(mapa,py);
         
-        //condicional de las monedas
-        if(posicion(a,px) == 2)
+        //condicional de las monedas y manzanas
+        if(posicion(a,px) == 2 || posicion(a,px) == 7)
         {
           puntos=puntos+10;
-
+          if(posicion(a,px)==2)
+          {
+            mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
+          }
+          if(posicion(a,px)==7)
+          {
+            tiempo=1;
+            mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
+            return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:1/10}});
+          }
           //actualiza el mundo
           mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); 
 
           //console.log("cantidad de monedas en el mapa: ", cantidadMonedas(mapa));
           //console.log("los puntos son: ", puntos);
         }else{
-          // console.log("no hay moneda");//por lo tanto no hace nada
+          //console.log("no hay moneda");//por lo tanto no hace nada
         }
       }
       
-      //Colisión con el charco de agua,con el agua y define el booleano muerteTomb en true.
+      //Colisión con el charco de agua y define el booleano muerteTomb en true.
       
       if(colisionTomb(px,py)==6)
       { 
         muerteTomb=true;
         vidas=vidas-1
-        return make(world, { time: world.time = 0, tomb: { x: 11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/20}});
+        return make(world, { time: world.time = 0, tomb: { x: 11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/10}});
       }
 
+      //Colision de tomb con el agua, regresa el agua a su posicion original y aumenta la velocidad de esta, define el booleano muerteTomb
       if(world.tomb.y>=(posicionYagua(world.agua)-32) && ((world.tomb.y)-40)<(posicionYagua(world.agua))-32){
         muerteTomb=true;
         vidas=vidas-1
-        return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/20}});
+        return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/10}});
       }
 
       //Función para restar las vidas de Tomb según su parámetro "vidas".
@@ -445,40 +489,48 @@
           perder=true;
         }
       }
+       
 
-
-      //Muestra una pantalla donde dice que Ganaste con la puntuacion que se consigue.
-
-      if(vidas==0){ 
-        vidas=vidas-1
+      if(vidas==0){
         Swal.fire({
           title: 'PERDISTE \n tu puntaje es: ',
           text: puntos,
           confirmButtonText: 'aceptar',
-          footer: 'adios a todos',
-          showConfirmButton: false
-        });
-        if(vidas<0){         
+          showConfirmButton: 'aceptar',
+          padding: '2rem',
+          //background: '#FDA715'
+          //grow: 'fullscreen'
+       
+        }).then(resultado => {
+        if (resultado.value) {
+            // Hicieron click enel boton
+             if(vidas<=0){         
           document.location.reload(mapa)
         }
+        perder=false
+            console.log("boton");
+        } 
+    });
+       vidas=vidas-1;      
       }
       
       //Muestra una pantalla donde dice que Perdiste con la puntuacion que se consigue.
         
-      if(cantMonedas==174&&puntos==1740)
-      {
+      if(cantMonedas==172&&puntos==1740)
+      { 
         puntos=puntos+1;
         Swal.fire({
           title: 'GANASTE \n tu puntaje es: ',
           text: puntos,
           confirmButtonText: 'aceptar',
-          footer: 'felicidades'
-        });
-        if((cantMonedas==174||puntos==1740)==true){        
-          document.location.reload(mapa)
+        }).then(resultado => {
+        if (resultado.value) {
+            // Hicieron click enel boton
+              if((cantMonedas==172||puntos==1740)==true){      document.location.reload(mapa)
+              }
         }
+        });  
       }
-
 
       //Condicionales que definen el movimiento de Tomb, las condicionales consta de un booleano Presionado"LaDireccion" que es true cuando pasa por el keyEvent, y dos funciones: comparacion() y posicioncentrica() que es true cuando tomb se encuentre centrado en el cuadro correspondiente; Dara velocidad hacia la direccion correspondiente y pone el booleano en false de nuevo.
       
@@ -541,6 +593,9 @@
       //Esta linea, hace que tomb siga actualizandose aun cuando no haya ningun bloque al lado ó no se haya cumplido las anteriores condicionales.
 
       return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width:world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry}, agua: moverAgua(world.agua, world.dir)});
+
+
+
     }
 
   
