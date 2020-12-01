@@ -34,8 +34,6 @@
     
   }
   
-
-
   /*
     Contrato: calcularPosicionTomb number, number --> structure
     Funcionalidad: Calcula la posicion en cuadricula cuando esta es multiplo de 40.
@@ -99,13 +97,16 @@
   }
   
   /*
-    Contrato: nombre, number, number --> number
-    Funcionalidad: .
-    nombre(){Cuerpo de la funcion}
+    Contrato: comeMoneda: numbre --> list
+    Funcionalidad: remplaza un elemento de una posicion dada de una lista por un cero
+    comeMoneda(){Cuerpo de la funcion}
     Ejemplos:
+     comeMoneda(2,[1,1,1,1,1])->[1,1,0,1,1]
+     comeMoneda(0,[1,1,1,1,1])->[0,1,1,1,1]  
+     comeMoneda(4,[1,1,1,1,1])->[1,1,1,1,0]     
   */
 
-  function comeMoneda(p, lista){
+  function comeMoneda(p,lista){
       if(isEmpty(lista)){
       return [];
       }
@@ -118,16 +119,15 @@
      }else{
       return lista; 
      }
-  }
-  
+  } 
   /*
-    Contrato: nombre, number, number --> number
-    Funcionalidad: .
-    nombre(){Cuerpo de la funcion}
+    Contrato: numbre, list, number --> list
+    Funcionalidad: reemplaza la nueva lista sin la moneda en el mapa
+    replaceX(x,lista, elem){Cuerpo de la funcion}
     Ejemplos:
-  */
-
-  // reemplaza la nueva lista sin la moneda
+      replaceX(0,[1,2,3],2)->[2,2,3] 
+      replaceX(3,[1,2,9,9,8],2)->[1,2,9,3,8] 
+  */ 
   function replaceX(x,lista, elem){
     if(x>=0 && x<lista.length){
       if(isEmpty(lista)){
@@ -302,26 +302,28 @@
   let vidas=3;
   let puntos=0;
 
-    /*contrato: actualizaVida: number -> number
+    /*contrato: actualizaVida: nothing -> number
     proposito: Actualizar los valores de vida dentro de la interfaz.
     actualizaVida(number){Cuerpo de la funcion}
     ejemplos:  
     actualizaVida(3) -> 3
-    actualizaVida(1) -> 1*/
+    actualizaVida(1) -> 1
+    */
 
-  function actualizaVida(vidas) {
+  function actualizaVida() {
     if (vidas>=0){
       verVidas.textContent = vidas;
     }
   };
-   /*contrato: actualizaPuntaje: number -> number
+   /*contrato: actualizaPuntaje: nothing -> number
     proposito: Actualizar los valores de puntaje dentro de la interfaz.
     actualizaPuntaje(number){Cuerpo de la funcion}
     ejemplos:  
     actualizaPuntaje(10) -> 10
-    actualizaPuntaje(100) -> 100*/
+    actualizaPuntaje(100) -> 100
+    */
 
-  function actualizaPuntaje(puntos) {
+  function actualizaPuntaje() {
     verScore.textContent = puntos;
   };
 
@@ -453,33 +455,28 @@
         }
       }
 
-      if(world.tomb.x>=1)
-      {   
-        a=posicion(mapa,py);
+      
+      
         
-        //condicional de las monedas y manzanas
-        if(posicion(a,px) == 2 || posicion(a,px) == 7)
+      //condicional de las monedas y manzanas, suma los puntos, y actualiza el mundo sin la moneda o manzana correspondiente.
+      
+      if(posicion(posicion(mapa,py),px) == 2 || posicion(posicion(mapa,py),px) == 7)
+      {
+        puntos=puntos+10;
+        if(posicion(posicion(mapa,py),px)==2)
         {
-          puntos=puntos+10;
-          if(posicion(a,px)==2)
-          {
-            mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
-          }
-          if(posicion(a,px)==7)
-          {
+          mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
+        }
+        if(posicion(posicion(mapa,py),px)==7)
+        {
             tiempo=1;
             mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
             return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:1/10}});
-          }
-          //actualiza el mundo
-          mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); 
-
-          //console.log("cantidad de monedas en el mapa: ", cantidadMonedas(mapa));
-          //console.log("los puntos son: ", puntos);
-        }else{
-          //console.log("no hay moneda");//por lo tanto no hace nada
         }
+        //actualiza el mundo
+        mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); 
       }
+     
       
       //Colisión con el charco de agua y define el booleano muerteTomb en true.
       
@@ -522,15 +519,15 @@
        
         }).then(resultado => {
         if (resultado.value) {
-            // Hicieron click en el boton
-             if(vidas<=0){         
-          document.location.reload(mapa)
-        }
-        perder=false
-            console.log("boton");
-        } 
-    });
-       vidas=vidas-1;      
+          // Hicieron click en el boton
+          if(vidas<=0)
+          {         
+            document.location.reload(mapa)
+          }
+          perder=false
+          console.log("boton");
+        }});
+        vidas=vidas-1;      
       }
       
       //Muestra una pantalla donde dice que Ganaste con la puntuacion que se consigue.
@@ -543,13 +540,14 @@
           text: puntos,
           confirmButtonText: 'aceptar',
         }).then(resultado => {
-        if (resultado.value) {
+        if (resultado.value) 
+        {
             // Hicieron click enel boton
-              if((cantMonedas==172||puntos==1740)==true){      document.location.reload(mapa)
-              }
-        }
-        });  
-     
+          if((cantMonedas==172||puntos==1740)==true)
+          {      
+            document.location.reload(mapa)
+          }
+        }});  
       }
 
       //Condicionales que definen el movimiento de Tomb, las condicionales consta de un booleano Presionado"LaDireccion" que es true cuando pasa por el keyEvent, y dos funciones: comparacion() y posicioncentrica() que es true cuando tomb se encuentre centrado en el cuadro correspondiente; Dara velocidad hacia la direccion correspondiente y pone el booleano en false de nuevo.
@@ -590,7 +588,6 @@
     
       if( recorrerBloques(listaBloques, px, py+1) && (world.tomb.diry ==4) && (comparar.y==centroTomb.y))
       {
-        //console.log("Choco contra la pared de abajo y paro");
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
 
@@ -598,13 +595,11 @@
       
       if( recorrerBloques(listaBloques, px-1, py) && (world.tomb.dirx==-4) && (comparar.x==centroTomb.x))
       {
-        //console.log("Choco contra la pared izq y paro")
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
       
       if( recorrerBloques(listaBloques,px+1, py) && (world.tomb.dirx ==4) && (comparar.x==centroTomb.x))
       {
-        //console.log("Choco contra la pared derecha y paro")
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
 
@@ -634,7 +629,6 @@
       if (keyCode==processing.UP)
       {
         presionadoArriba =true;
-        //console.log("le hundi arriba")
         if(world.tomb.diry==4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: -world.tomb.diry }} );
@@ -650,7 +644,6 @@
       if (keyCode==processing.DOWN)
       {
         presionadoAbajo =true;
-        //console.log("le hundi abajo")
         if(world.tomb.diry==-4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: -world.tomb.diry }} );
@@ -666,7 +659,6 @@
       if (keyCode==processing.LEFT)
       {
         presionadoIzquierda =true;
-        //console.log("le hundi izquierda")
         if(world.tomb.dirx==4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: -world.tomb.dirx, diry: 0 }} );
@@ -682,7 +674,6 @@
       if (keyCode==processing.RIGHT)
       {
         presionadoDerecha =true;
-        //console.log("le hundi derecha")
         if(world.tomb.dirx==-4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: -world.tomb.dirx, diry: 0 }} );
