@@ -1,55 +1,52 @@
-<body background="images/fondo.png">
 <html>
-      <font face="Roman" color="F7F71C" size="8">Tomb of the mask</font>
-   </body>
+
+   
    <head>
    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width">
-    <title>repl.it</title> <link rel="icon"type="images/juego.png"width="600" height="960"
+    <title>Tomb</title> <link rel="icon"type="images/juego.png"width="600" height="960"
     <link href="style.css" rel="stylesheet" type="text/css" />
     <title>FDP</title>
-    
-  <div id= "contenedorJuego">
-    <canvas id="canvas" width="960" height="600"> </canvas>
-       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-   </div>
-
+      
    </head>
-   
-    <h2>
-    <body>
-      <audio src="musica/BitShift.mp3" autoplay controls loop ></audio>
-    <nav class="navbar navbar-default" role="navigation">
-  <!-- El logotipo y el icono que despliega el menú se agrupan
-       para mostrarlos mejor en los dispositivos móviles -->
-      <div>
-      Vida: <a id="vidas"></a>
-        <br>
-      Puntaje: <a id="puntos"></a> 
-      </div>
-    </h2>
-
+    <body background="images/fondo.png">
+      <table style="margin: 0 auto;">
+      <font face="Roman" color="F7F71C" size="8"><center>Tomb of the mask</center></font>
+      </table>
+      <table>
+        <tr>
+          <td width="150">
+            <br>
+          </td>
+          <td width="190">
+            <div>
+            <font color="F7F71C" size="6">Vida: <a id="vidas"></a></font>
+            <br>
+            <font color="F7F71C" size="6">Puntaje: <a id="puntos"></a> </font>
+            </div>
+            <form method="get"> 
+            <body></body>
+            <button id="reinicio" type="submit">Reiniciar Juego</button>
+          </td>
+          <td>      
+            <div id= "canvas-container">
+             <canvas id="canvas" width="960" height="600"> </canvas>
+            </div>
+          </td>
+          <td>
+            <br>
+          </td>
+        </tr>
+      </table>
     <script src="js/functional-light.js"></script>
     <script src="js/processing.js"></script>
     <script src="js/fl-extended.js"></script>
     <script src="mapa.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
     <script src="js/sweetAlert.js"></script>  
-
-
-    <div id="canvas-container"></div>
-      
-
-   
-      <form method="get" 
-      <body style="background-color:rgb(0,26,140);"></body>
-         <button id="hola" type="submit">Reiniciar Juego</button>
-      >
+    
   </body>
-
-  
-  
-
+    <audio src="musica/Bitshift.mp3" autoplay loop></audio>
   </html>
 
 

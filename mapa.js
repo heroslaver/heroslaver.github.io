@@ -296,17 +296,32 @@
   let presionadoIzquierda=false;
   let perder=false;
   let tiempo=0;
+  let inicio = true;
 
   //Variables de interfaz
   let vidas=3;
   let puntos=0;
 
-  // Actualizar las vidas en el tablero
-  function actualizaVida() {
-    verVidas.textContent = vidas;
+    /*contrato: actualizaVida: number -> number
+    proposito: Actualizar los valores de vida dentro de la interfaz.
+    actualizaVida(number){Cuerpo de la funcion}
+    ejemplos:  
+    actualizaVida(3) -> 3
+    actualizaVida(1) -> 1*/
+
+  function actualizaVida(vidas) {
+    if (vidas>=0){
+      verVidas.textContent = vidas;
+    }
   };
-   //Actualiza el puntaje del usuario
-  function actualizaPuntaje() {
+   /*contrato: actualizaPuntaje: number -> number
+    proposito: Actualizar los valores de puntaje dentro de la interfaz.
+    actualizaPuntaje(number){Cuerpo de la funcion}
+    ejemplos:  
+    actualizaPuntaje(10) -> 10
+    actualizaPuntaje(100) -> 100*/
+
+  function actualizaPuntaje(puntos) {
     verScore.textContent = puntos;
   };
 
@@ -329,10 +344,10 @@
 				[1, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 2, 1, 2, 2, 2, 1, 2, 1, 2, 2, 2, 5],
 				[1, 2, 3, 1, 6, 2, 5, 2, 2, 5, 2, 1, 2, 1, 2, 1, 2, 2, 2, 2, 2, 1, 2, 1],
 				[1, 2, 2, 2, 5, 2, 1, 2, 2, 1, 2, 2, 2, 1, 6, 1, 5, 1, 1, 1, 1, 1, 2, 1],
-				[1, 1, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
-				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 1, 2, 3, 1],
+				[1, 6, 4, 2, 1, 2, 2, 2, 3, 1, 1, 4, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 2, 1],
+				[5, 2, 2, 2, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 6, 2, 1, 2, 6, 1],
 				[1, 2, 3, 1, 4, 2, 6, 1, 2, 2, 3, 1, 1, 4, 2, 5, 1, 1, 1, 2, 5, 2, 2, 1],
-				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 1, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
+				[1, 2, 2, 2, 2, 2, 2, 1, 5, 2, 2, 6, 2, 2, 2, 2, 2, 2, 1, 2, 1, 4, 2, 1],
 				[1, 2, 1, 2, 1, 1, 2, 2, 1, 2, 2, 5, 1, 4, 2, 3, 1, 2, 2, 2, 2, 2, 2, 1],
 				[1, 2, 1, 2, 2, 5, 4, 2, 1, 4, 2, 1, 2, 2, 2, 2, 1, 2, 2, 6, 2, 3, 1, 5],
 				[5, 2, 6, 4, 2, 1, 2, 2, 2, 2, 0, 0, 0, 1, 4, 2, 1, 4, 2, 5, 2, 2, 2, 1],
@@ -359,7 +374,7 @@
       MURO3=processing.loadImage("images/muro3.png");
       MURO4=processing.loadImage("images/muro4.png");
       AGUITA=processing.loadImage("images/Aguita.png");
-      tomb=processing.loadImage("images/tomb2.png");
+      tomb=processing.loadImage("images/tomb.png");
       MONEDA=processing.loadImage("images/moneda.png");
       MANZANA=processing.loadImage("images/Apple.png");
       AGUA=processing.loadImage("images/Agua.jpeg");
@@ -380,6 +395,7 @@
       {processing.image(AGUA,sn.x*1,sn.y*1,1000,600)});
       actualizaVida();
       actualizaPuntaje();
+      
 
       // Dibuja el mapa en filas, dando una imagen a cada celda
       recursivelist(mapa, (row, i) => {
@@ -418,7 +434,6 @@
 
     //actualiza el juego en cada tic del framerate.
     processing.onTic = function (world) {
-   
 
       //Dice lo que hay en la posicion de tomb X y Y con el llamado de la funcion calcularPosicionTomb().
       px=(posicionActualTomb.x)
@@ -427,13 +442,16 @@
       //Condicional que comienza a contar cuando tomb recoge una manzana, hace que el agua vuelva a la normalidad.
       if(tiempo==(10*60)){
         tiempo=0;
-        console.log(tiempo);
         return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:-1/20}});
       }
       else if(tiempo<(10*60) && tiempo>0){
         tiempo=tiempo+1;
+        if(posicionYagua(world.agua)>=(15*SIZE))
+        {
+          console.log("cumplio");
+          tiempo=(10*60);
+        }
       }
-
 
       if(world.tomb.x>=1)
       {   
@@ -479,7 +497,7 @@
         return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/10}});
       }
 
-      //Función para restar las vidas de Tomb según su parámetro "vidas".
+      //Restar las vidas de Tomb según su parámetro "vidas".
        
       if(muerteTomb==true){
         if(vidas>0){
@@ -490,6 +508,7 @@
         }
       }
        
+      //Botón de reinicio tras perder todas las vidas.
 
       if(vidas==0){
         Swal.fire({
@@ -503,7 +522,7 @@
        
         }).then(resultado => {
         if (resultado.value) {
-            // Hicieron click enel boton
+            // Hicieron click en el boton
              if(vidas<=0){         
           document.location.reload(mapa)
         }
@@ -514,7 +533,7 @@
        vidas=vidas-1;      
       }
       
-      //Muestra una pantalla donde dice que Perdiste con la puntuacion que se consigue.
+      //Muestra una pantalla donde dice que Ganaste con la puntuacion que se consigue.
         
       if(cantMonedas==172&&puntos==1740)
       { 
@@ -530,6 +549,7 @@
               }
         }
         });  
+     
       }
 
       //Condicionales que definen el movimiento de Tomb, las condicionales consta de un booleano Presionado"LaDireccion" que es true cuando pasa por el keyEvent, y dos funciones: comparacion() y posicioncentrica() que es true cuando tomb se encuentre centrado en el cuadro correspondiente; Dara velocidad hacia la direccion correspondiente y pone el booleano en false de nuevo.
@@ -565,13 +585,12 @@
       
       if ( recorrerBloques(listaBloques, px, py-1) && (world.tomb.diry ==-4)  && (comparar.y==centroTomb.y))
       {
-        console.log("Choco contra la pared de arriba y paro")
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
     
       if( recorrerBloques(listaBloques, px, py+1) && (world.tomb.diry ==4) && (comparar.y==centroTomb.y))
       {
-        console.log("Choco contra la pared de abajo y paro");
+        //console.log("Choco contra la pared de abajo y paro");
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
 
@@ -579,21 +598,25 @@
       
       if( recorrerBloques(listaBloques, px-1, py) && (world.tomb.dirx==-4) && (comparar.x==centroTomb.x))
       {
-        console.log("Choco contra la pared izq y paro")
+        //console.log("Choco contra la pared izq y paro")
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
       
       if( recorrerBloques(listaBloques,px+1, py) && (world.tomb.dirx ==4) && (comparar.x==centroTomb.x))
       {
-        console.log("Choco contra la pared derecha y paro")
+        //console.log("Choco contra la pared derecha y paro")
         return make(world, {time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:0}});
       }
+
 
 
       //Esta linea, hace que tomb siga actualizandose aun cuando no haya ningun bloque al lado ó no se haya cumplido las anteriores condicionales.
 
       return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width:world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry}, agua: moverAgua(world.agua, world.dir)});
 
+        
+   
+      
 
 
     }
@@ -611,7 +634,7 @@
       if (keyCode==processing.UP)
       {
         presionadoArriba =true;
-        console.log("le hundi arriba")
+        //console.log("le hundi arriba")
         if(world.tomb.diry==4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: -world.tomb.diry }} );
@@ -627,7 +650,7 @@
       if (keyCode==processing.DOWN)
       {
         presionadoAbajo =true;
-        console.log("le hundi abajo")
+        //console.log("le hundi abajo")
         if(world.tomb.diry==-4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: 0, diry: -world.tomb.diry }} );
@@ -643,7 +666,7 @@
       if (keyCode==processing.LEFT)
       {
         presionadoIzquierda =true;
-        console.log("le hundi izquierda")
+        //console.log("le hundi izquierda")
         if(world.tomb.dirx==4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: -world.tomb.dirx, diry: 0 }} );
@@ -659,7 +682,7 @@
       if (keyCode==processing.RIGHT)
       {
         presionadoDerecha =true;
-        console.log("le hundi derecha")
+        //console.log("le hundi derecha")
         if(world.tomb.dirx==-4)
         {
           return make(world,{tomb:{ x: world.tomb.x, y:world.tomb.y, width: world.tomb.width, height:world.tomb.height, dirx: -world.tomb.dirx, diry: 0 }} );
