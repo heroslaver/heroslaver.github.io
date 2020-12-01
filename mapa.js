@@ -265,8 +265,6 @@
     }
   }
 
-
-
   //tamaño estandar de todo dentro del mapa
   const SIZE = 40;
 
@@ -284,7 +282,6 @@
   let MONEDA=null;
   let AGUA=null;
   let MANZANA=null;
-  
   
   //Variables utilizadas dentro de funciones.
   let quieto=false;
@@ -329,11 +326,6 @@
 
   const verScore = document.getElementById("puntos");
   const verVidas = document.getElementById("vidas");
-  
-  
-
-  
-  
   
 
   //Matriz del mapa
@@ -382,7 +374,7 @@
       AGUA=processing.loadImage("images/Agua.jpeg");
       
       //Crea los atributos internos de Tomb y del agua.
-      processing.state={tomb:{x:11*SIZE, y:13*SIZE, width:(SIZE), height:(SIZE), dirx:0, diry:0}, agua:[{x:0, y:610}], dir:{x:0, y:-1/20}};
+      processing.state={tomb:{x:11*SIZE, y:13*SIZE, width:(SIZE), height:(SIZE), dirx:0, diry:0}, agua:[{x:0, y:610}], dir:{x:0, y:-1/15}};
     }
 
     //Todo lo que dibuja al juego
@@ -433,7 +425,6 @@
       processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
     }
 
-
     //actualiza el juego en cada tic del framerate.
     processing.onTic = function (world) {
 
@@ -444,7 +435,7 @@
       //Condicional que comienza a contar cuando tomb recoge una manzana, hace que el agua vuelva a la normalidad.
       if(tiempo==(10*60)){
         tiempo=0;
-        return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:-1/20}});
+        return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:-1/15}});
       }
       else if(tiempo<(10*60) && tiempo>0){
         tiempo=tiempo+1;
@@ -454,10 +445,7 @@
           tiempo=(10*60);
         }
       }
-
-      
-      
-        
+   
       //condicional de las monedas y manzanas, suma los puntos, y actualiza el mundo sin la moneda o manzana correspondiente.
       
       if(posicion(posicion(mapa,py),px) == 2 || posicion(posicion(mapa,py),px) == 7)
@@ -477,7 +465,6 @@
         mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); 
       }
      
-      
       //Colisión con el charco de agua y define el booleano muerteTomb en true.
       
       if(colisionTomb(px,py)==6)
@@ -526,6 +513,7 @@
           }
           perder=false
           console.log("boton");
+          
         }});
         vidas=vidas-1;      
       }
@@ -533,7 +521,8 @@
       //Muestra una pantalla donde dice que Ganaste con la puntuacion que se consigue.
         
       if(cantMonedas==172&&puntos==1740)
-      { 
+      {
+        vidas=3;
         puntos=puntos+1;
         Swal.fire({
           title: 'GANASTE \n tu puntaje es: ',
@@ -542,11 +531,12 @@
         }).then(resultado => {
         if (resultado.value) 
         {
-            // Hicieron click enel boton
+            // Hicieron click en el boton
           if((cantMonedas==172||puntos==1740)==true)
           {      
             document.location.reload(mapa)
           }
+          
         }});  
       }
 
@@ -576,7 +566,6 @@
         return make(world, {time:world.time+1,tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:4, diry:0}});
       }     
 
-
       //Todas las condiciones siguientes usan la funcion recorrerBloques() y dentro de esta funcion  se usa las siguientes funciones: colisionTomb(), posicion(). los argumentos que usa la funcion recorrerBloques() es: listaBloques creada en la linea 249,y la estructura creada apartir de la funcion calcularPosicionTomb(); las otras condicionales, verifican la velocidad de tomb y compara dos funciones: comparacion() y posicioncentrica() para frenar solo y cuando tomb se encuentre centrado.
      
       //Colision a lo largo del tiempo en el eje Y, cuando pasa la condicion adecuada pone la velocidad en 0.
@@ -604,22 +593,12 @@
       }
 
 
-
       //Esta linea, hace que tomb siga actualizandose aun cuando no haya ningun bloque al lado ó no se haya cumplido las anteriores condicionales.
 
       return make(world, { time: world.time + 1, tomb: { x: world.tomb.x + world.tomb.dirx, y: world.tomb.y + world.tomb.diry, width:world.tomb.width, height:world.tomb.height, dirx: world.tomb.dirx, diry: world.tomb.diry}, agua: moverAgua(world.agua, world.dir)});
 
-        
-   
-      
-
-
     }
 
-  
-
-
-  
     //Cada vez que se presione una direccion va a tener una nueva velocidad en X, Y ó tener la misma velocidad segun las condicionales.
 
     processing.onKeyEvent = function (world, keyCode) {
