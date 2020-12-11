@@ -120,14 +120,16 @@
       return lista; 
      }
   } 
+
   /*
     Contrato: numbre, list, number --> list
-    Funcionalidad: reemplaza la nueva lista sin la moneda en el mapa
+    Funcionalidad: reemplaza la nueva lista sin la moneda en el mapa.
     replaceX(x,lista, elem){Cuerpo de la funcion}
     Ejemplos:
       replaceX(0,[1,2,3],2)->[2,2,3] 
       replaceX(3,[1,2,9,9,8],2)->[1,2,9,3,8] 
   */ 
+
   function replaceX(x,lista, elem){
     if(x>=0 && x<lista.length){
       if(isEmpty(lista)){
@@ -146,7 +148,7 @@
 
   /*
     Contrato: apply, list, function --> list
-    Funcionalidad: aplica los atributos definidos para un elemento a la forma o parte visual de este.
+    Funcionalidad: aplica una funcion al primer elemento de una lista recursivamente.
     apply(){Cuerpo de la funcion}
   */
   
@@ -381,7 +383,7 @@
     processing.drawGame = function (world) {
       processing.background(0, 0, 0);
       
-      //llamadas de funciones para hacer uso de ellas mas adelante del codio
+      //llamadas de funciones para hacer uso de ellas mas adelante del codigo
       calcularPosicionTomb(world.tomb.x,world.tomb.y);
       posicionCentrica(world.tomb.x,world.tomb.y);
       comparacion();
@@ -425,6 +427,7 @@
       processing.image(tomb, world.tomb.x , world.tomb.y, world.tomb.width,world.tomb.height);
     }
 
+
     //actualiza el juego en cada tic del framerate.
     processing.onTic = function (world) {
 
@@ -441,7 +444,6 @@
         tiempo=tiempo+1;
         if(posicionYagua(world.agua)>=(15*SIZE))
         {
-          console.log("cumplio");
           tiempo=(10*60);
         }
       }
@@ -451,15 +453,16 @@
       if(posicion(posicion(mapa,py),px) == 2 || posicion(posicion(mapa,py),px) == 7)
       {
         puntos=puntos+10;
+
         if(posicion(posicion(mapa,py),px)==2)
         {
           mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
         }
         if(posicion(posicion(mapa,py),px)==7)
         {
-            tiempo=1;
-            mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
-            return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:1/10}});
+          tiempo=1;
+          mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py))));
+          return make(world, { time: world.time + 1, agua:[{x:0,y:posicionYagua(world.agua)}],dir:{x:0,y:1/10}});
         }
         //actualiza el mundo
         mapa=(replaceX(py,mapa,comeMoneda(px,posicion(mapa,py)))); 
@@ -481,8 +484,7 @@
         return make(world, { time: world.time = 0, tomb: { x:  11*SIZE, y: 13*SIZE, width: SIZE, height:SIZE, dirx: 0, diry: 0}, agua:[{x:0,y:620}],dir:{x:0,y:-1/10}});
       }
 
-      //Restar las vidas de Tomb según su parámetro "vidas".
-       
+      //Restar las vidas de Tomb según su parámetro "vidas".      
       if(muerteTomb==true){
         if(vidas>0){
           muerteTomb=false;
@@ -544,26 +546,43 @@
       
       if (presionadoArriba && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
       {
-        presionadoArriba =false;
-        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:-4}});
+        if (recorrerBloques(listaBloques, px, py-1)){
+         
+        }else{
+          presionadoArriba =false;
+          return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry: -4}});
+        }
+
       }
 
       if (presionadoAbajo && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
       {
-        presionadoAbajo =false;
-        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:4}});
+        if (recorrerBloques(listaBloques, px, py+1)){
+         
+        }else{
+          presionadoAbajo =false;
+          return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:0, diry:4}});
+        }
       }
 
       if (presionadoIzquierda && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
       {
-        presionadoIzquierda=false;
-        return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:-4, diry:0}});
+        if (recorrerBloques(listaBloques, px-1, py)){
+          
+        }else{
+          presionadoIzquierda=false;
+          return make(world,{time:world.time+1, tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:-4, diry:0}});
+        }
       } 
 
       if (presionadoDerecha && comparar.y == centroTomb.y && comparar.x==centroTomb.x)
       {
-        presionadoDerecha=false;
-        return make(world, {time:world.time+1,tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:4, diry:0}});
+        if (recorrerBloques(listaBloques, px+1, py)){
+          
+        }else{
+          presionadoDerecha=false;
+          return make(world, {time:world.time+1,tomb:{x:world.tomb.x, y:world.tomb.y, width:world.tomb.width, height:world.tomb.height, dirx:4, diry:0}});
+        }
       }     
 
       //Todas las condiciones siguientes usan la funcion recorrerBloques() y dentro de esta funcion  se usa las siguientes funciones: colisionTomb(), posicion(). los argumentos que usa la funcion recorrerBloques() es: listaBloques creada en la linea 249,y la estructura creada apartir de la funcion calcularPosicionTomb(); las otras condicionales, verifican la velocidad de tomb y compara dos funciones: comparacion() y posicioncentrica() para frenar solo y cuando tomb se encuentre centrado.
@@ -664,6 +683,8 @@
       }
     }
 
+
+
     // ******************** De aquí hacia abajo no debe cambiar nada. ********************
 
     // Esta es la función que pinta todo. Se ejecuta n veces por segundo. 
@@ -710,13 +731,6 @@
     // Fin de los eventos del mouse
   }
  
-
-
-
-
-
-
-
 
 
 
